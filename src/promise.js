@@ -38,7 +38,11 @@
      * Body can call resolveCallback and rejectCallback asynchronously
      * we instrument instrumentedResolveCallback to track when it has been called
      */
-    this.body(instrumentedResolveCallback, instrumentedRejectCallback);
+    try {
+      this.body(instrumentedResolveCallback, instrumentedRejectCallback);
+    } catch (e) {
+      instrumentedRejectCallback(e);
+    }
 
     return new Promise(function(resolve, reject) {
       //TODO: Handle other cases, rejection, exceptions
