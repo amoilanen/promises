@@ -8,30 +8,30 @@
 
   Promise.prototype.then = function(resolveCallback, rejectCallback) {
     var self = this;
-    var finishedSelf = false;
-    var resolvedValue = undefined;
+    var wasResolved = false;
+    var computedValue = undefined;
     var exceptionCaught = undefined;
 
     var instrumentedResolveCallback = function() {
       var args = [].slice.call(arguments, 0);
 
       try {
-        resolvedValue = resolveCallback.apply(self, args);
+        computedValue = resolveCallback.apply(self, args);
       } catch (e) {
         exceptionCaught = e;
       }
-      finishedSelf = true;
+      wasResolved = true;
     };
 
     var instrumentedRejectCallback = function() {
       var args = [].slice.call(arguments, 0);
 
       try {
-        resolvedValue = rejectCallback.apply(self, args);
+        computedValue = rejectCallback.apply(self, args);
       } catch (e) {
         exceptionCaught = e;
       }
-      finishedSelf = true;
+      wasResolved = true;
     };
 
     /*
@@ -47,15 +47,15 @@
     return new Promise(function(resolve, reject) {
       //TODO: Handle other cases, rejection, exceptions
       setTimeout(function waitingForSelf() {
-        if (finishedSelf) {
-          if (exceptionCaught) {
-            reject(exceptionCaught);
-          } else {
-            resolve(resolvedValue);
-          }
-        } else {
-          setTimeout(waitingForSelf, TIMEOUT);
+        if (exceptionCaught) {
+          reject(exceptionCaught);
+          return;
         }
+        if (wasResolved) {
+          resolve(computedValue);
+          return;
+        }
+        setTimeout(waitingForSelf, TIMEOUT);
       }, TIMEOUT);
     });
   };

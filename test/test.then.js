@@ -89,15 +89,15 @@ module("jsPromise.then");
   });
 
   asyncTest("Promise.then if an error is thrown in the resolve callback, the returned promise rejects with that error", function() {
-    var value = 4241;
+    var initialValue = 4241;
     var errorMessage = "Error occurred";
 
     new Promise(function(resolve, reject) {
       setTimeout(function() {
-        resolve(value);
+        resolve(initialValue);
       }, 500);
     }).then(function() {
-        throw new Error(errorMessage);
+      throw new Error(errorMessage);
     }).then(function(value) {}, function(error) {
       equal(errorMessage, error.message, "onRejected callback is called in case error is thrown");
       return error;
@@ -108,21 +108,67 @@ module("jsPromise.then");
   });
 
   asyncTest("Promise.then if an error is thrown in the original promise body, the returned promise rejects with that error", function() {
-    var value = 4241;
     var errorMessage = "Error occurred";
 
     new Promise(function(resolve, reject) {
-        throw new Error(errorMessage);
+      throw new Error(errorMessage);
     }).then(function() {}, function(value) {
       equal(errorMessage, value.message, "'then' returns a promise which is rejected with the value of error in the original promise body");
       start();
     });
   });
 
-  //TODO: Exception both in the body of the initial promise and the resolve callback
-  //TODO: Exception thrown in the reject callback
-  //TODO: Chaining one of the promises is rejected
+  asyncTest("Promise.then the case when errors happen both in body and callback is handled", function() {
+    var errorMessage = "Error occurred";
+
+    new Promise(function(resolve, reject) {
+      throw new Error(errorMessage);
+    }).then(function() {}, function(value) {
+      equal(errorMessage, value.message, "'then' returns a promise which is rejected with the value of error in the original promise body");
+      throw value;
+    }).then(function(value) {}, function(error) {
+      equal(errorMessage, error.message, "onRejected callback is called in case error is thrown");
+      return error;
+    }).then(function(value) {
+      equal(errorMessage, value.message, "Value passed to onRejected callback becomes the value the promise created by 'then' resolves to");
+      start();
+    });
+  });
+
+  asyncTest("Promise.then if exception is thrown in the reject callback then the returned promise rejects with that error", function() {
+    var initialValue = 4241;
+    var errorMessage = "Error occurred";
+
+    new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        reject(initialValue);
+      }, 500);
+    }).then(function() {}, function(value) {
+      throw new Error(errorMessage);
+    }).then(function(value) {}, function(error) {
+      equal(errorMessage, error.message, "onRejected callback is called in case error is thrown");
+      return error;
+    }).then(function(value) {
+      equal(errorMessage, value.message, "Value passed to onRejected callback becomes the value the promise created by 'then' resolves to");
+      start();
+    });
+  });
+
+  asyncTest("Promise.then promises in the chain can be rejected", function() {
+    var initialValue = 0;
+
+    var promise = new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        reject(initialValue);
+      }, 500);
+    }).then(function() {}, function(value) {
+      equal(initialValue, value, "'reject' callback is called with the corresponding value");
+      return value;
+    }).then(function(value) {
+      equal(initialValue, value, "promise resolves to the value returned from 'reject' callback");
+      start();
+    });
+  });
 
   //TODO: 'this' is correct in each callback when executing a promise
-  //TODO: Error is thrown in the constructor, then it is passed to "reject"
 })();
