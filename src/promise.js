@@ -6,6 +6,10 @@
     this.body = body;
   }
 
+  Promise.prototype.catch = function(catchCallback) {
+    return this.then(function(){}, catchCallback);
+  };
+
   Promise.prototype.then = function(resolveCallback, rejectCallback) {
     var self = this;
     var wasResolved = false;

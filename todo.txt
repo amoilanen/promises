@@ -45,8 +45,6 @@ reject(obj)
 Your promise is rejected with obj. For consistency and debugging (eg stack traces), obj should be an instanceof Error. Any errors thrown in the constructor callback will be implicitly passed to reject().
 Instance Methods
 
-promise.then(onFulfilled, onRejected)
-onFulfilled is called when/if "promise" resolves. onRejected is called when/if "promise" rejects. Both are optional, if either/both are omitted the next onFulfilled/onRejected in the chain is called. Both callbacks have a single parameter , the fulfillment value or rejection reason. "then" returns a new promise equivalent to the value you return from onFulfilled/onRejected after being passed through Promise.resolve. If an error is thrown in the callback, the returned promise rejects with that error.
 promise.catch(onRejected)
 Sugar for promise.then(undefined, onRejected)
 Many thanks to Anne van Kesteren, Domenic Denicola, Tom Ashworth, Remy Sharp, Addy Osmani, Arthur Evans, and Yutaka Hirano who proofread this and made corrections/recommendations.

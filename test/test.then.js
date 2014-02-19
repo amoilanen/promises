@@ -170,5 +170,9 @@ module("jsPromise.then");
     });
   });
 
+  //TODO: Promise can be resolved with 'undefined', 'null'
+  //TODO: Promise can be rejected with 'undefined', 'null'
+  //TODO: 'resolve' callback is 'undefined', 'null'
+  //TODO: 'reject' callback is 'undefined', 'null'
   //TODO: 'this' is correct in each callback when executing a promise
 })();
