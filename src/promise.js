@@ -6,6 +6,16 @@
     this.body = body;
   }
 
+  Promise.cast = function(value) {
+    return new Promise(function(resolve, reject) {
+      if (value.then && (typeof(value.then) == "function")) {
+        value.then(resolve, reject);
+      } else {
+        resolve(value);
+      }
+    });
+  };
+
   Promise.prototype.catch = function(catchCallback) {
     return this.then(function(){}, catchCallback);
   };
