@@ -39,5 +39,20 @@ module("jsPromise.cast");
     });
   });
 
+  asyncTest("Promise.cast called with a promise returns that promise", function() {
+    var resolveValue = "resolveValue";
+    var originalPromise = new Promise(function(resolve, reject) {
+      resolve(resolveValue);
+    });
+    var castedPromise = Promise.cast(originalPromise);
+
+    equal(castedPromise, originalPromise, "Same promise object is returned");
+    castedPromise.then(function(value) {
+      equal(value, resolveValue, "After casting the promise still works");
+      start();
+    });
+  });
+
+  //TODO: "resolve" should be an alias for "cast"
   //TODO: Promise-like object has an asychronous 'then'
 })();

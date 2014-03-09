@@ -7,7 +7,7 @@
   }
 
   Promise.cast = function(value) {
-    return new Promise(function(resolve, reject) {
+    return (value.constructor == Promise) ? value : new Promise(function(resolve, reject) {
       if (value.then && (typeof(value.then) == "function")) {
         value.then(resolve, reject);
       } else {
