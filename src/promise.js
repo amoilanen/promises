@@ -6,14 +6,22 @@
     this.body = body;
   }
 
-  Promise.cast = function(value) {
-    return (value.constructor == Promise) ? value : new Promise(function(resolve, reject) {
+  Promise.resolve = function(value) {
+    return new Promise(function(resolve, reject) {
       if (value.then && (typeof(value.then) == "function")) {
         value.then(resolve, reject);
       } else {
         resolve(value);
       }
     });
+  };
+
+  Promise.cast = function(value) {
+    return (value.constructor == Promise) 
+      ? value
+      : new Promise(function(resolve, reject) {
+        resolve(value);
+      });
   };
 
   Promise.prototype.catch = function(catchCallback) {

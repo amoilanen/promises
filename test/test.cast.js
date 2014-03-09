@@ -11,7 +11,7 @@ module("jsPromise.cast");
     });
   });
 
-  asyncTest("Promise.cast casts resolving promise-like object with 'then' to promise", function() {
+  asyncTest("Promise.cast with a promise like object with 'then' returns that object", function() {
     var resolvedValue = "resolvedValue";
     var resolvingPromiseLikeObject = {
       then: function(resolve, reject) {
@@ -20,21 +20,7 @@ module("jsPromise.cast");
     };
 
     Promise.cast(resolvingPromiseLikeObject).then(function(value) {
-      equal(value, resolvedValue, "Promise-like object is casted as promise");
-      start();
-    });
-  });
-
-    asyncTest("Promise.cast casts rejecting promise-like object with 'then' to promise", function() {
-    var rejectedValue = "rejectedValue";
-    var rejectingPromiseLikeObject = {
-      then: function(resolve, reject) {
-        reject(rejectedValue);
-      }
-    };
-
-    Promise.cast(rejectingPromiseLikeObject).then(function() {}, function(value) {
-      equal(value, rejectedValue, "Promise-like object is casted as promise");
+      equal(value, resolvingPromiseLikeObject, "Original promise-like object is returned");
       start();
     });
   });
@@ -52,7 +38,4 @@ module("jsPromise.cast");
       start();
     });
   });
-
-  //TODO: "resolve" should be an alias for "cast"
-  //TODO: Promise-like object has an asychronous 'then'
 })();
