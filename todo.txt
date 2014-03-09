@@ -6,26 +6,6 @@ API:
 
 Static Methods
 
-Promise.cast(promise);
-Returns promise (only if promise.constructor == Promise)
-Note: Only implemented in Chrome so far
-
-Promise.cast(obj);
-Make a promise that fulfills to obj.
-Note: Only implemented in Chrome so far
-
-Promise.resolve(thenable);
-Make a new promise from the thenable. A thenable is promise-like in as far as it has a "then" method. This also creates a new promise if you pass it a genuine JavaScript promise, making it less efficient for casting than Promise.cast.
-Note: Chrome incorrectly calls this Promise.resolved
-
-Promise.resolve(obj);
-Make a promise that fulfills to obj. Same as Promise.cast(obj) in this situation.
-Note: Chrome incorrectly calls this Promise.resolved
-
-Promise.reject(obj);
-Make a promise that rejects to obj. For consistency and debugging (eg stack traces), obj should be an instanceof Error
-Note: Chrome incorrectly calls this Promise.rejected
-
 Promise.all(array);
 Make a promise that fulfills when every item in the array fulfills, and rejects if (and when) any item rejects. Eadd array item is passed to Promise.cast, so the array can be a mixture of promise-like objects and other objects. The fulfillment value is an array (in order) of fulfillment values. The rejection value is the first rejection value.
 Note: Only implemented in Chrome so far
@@ -45,6 +25,4 @@ reject(obj)
 Your promise is rejected with obj. For consistency and debugging (eg stack traces), obj should be an instanceof Error. Any errors thrown in the constructor callback will be implicitly passed to reject().
 Instance Methods
 
-promise.catch(onRejected)
-Sugar for promise.then(undefined, onRejected)
 Many thanks to Anne van Kesteren, Domenic Denicola, Tom Ashworth, Remy Sharp, Addy Osmani, Arthur Evans, and Yutaka Hirano who proofread this and made corrections/recommendations.

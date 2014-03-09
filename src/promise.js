@@ -16,6 +16,13 @@
     });
   };
 
+  Promise.reject = function(value) {
+    return new Promise(function(resolve, reject) {
+        reject(value);
+      }
+    );
+  };
+
   Promise.cast = function(value) {
     return (value.constructor == Promise) 
       ? value

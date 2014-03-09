@@ -68,6 +68,4 @@ module("jsPromise.resolve");
       start();
     });
   });
-
-  //TODO: Promise-like object has an asychronous 'then'
 })();
