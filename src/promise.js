@@ -4,6 +4,11 @@
 
   function Promise(body) {
     this.body = body;
+
+    this.resolveCallbackWasCalledByBody = false;
+    this.resolveCallbackArgs = null;
+    this.rejectCallbackWasCalledByBody = false;
+    this.rejectCallbackArgs = null;
   }
 
   Promise.all = function(promises) {
@@ -83,9 +88,15 @@
     var computedValue = undefined;
     var exceptionCaught = undefined;
 
+    /*
+     * Body can call resolveCallback and rejectCallback asynchronously
+     * we instrument instrumentedResolveCallback to track when it has been called
+     */
     var instrumentedResolveCallback = function() {
       var args = [].slice.call(arguments, 0);
 
+      self.resolveCallbackWasCalledByBody = true;
+      self.resolveCallbackArgs = args;
       try {
         computedValue = resolveCallback.apply(self, args);
       } catch (e) {
@@ -97,6 +108,8 @@
     var instrumentedRejectCallback = function() {
       var args = [].slice.call(arguments, 0);
 
+      self.rejectCallbackWasCalledByBody = true;
+      self.rejectCallbackArgs = args;
       try {
         computedValue = rejectCallback.apply(self, args);
       } catch (e) {
@@ -106,17 +119,22 @@
     };
 
     /*
-     * Body can call resolveCallback and rejectCallback asynchronously
-     * we instrument instrumentedResolveCallback to track when it has been called
+     * If the resolveCallback and rejectCallback were called by the body already
+     * avoid executing the body multiple times
      */
-    try {
-      this.body(instrumentedResolveCallback, instrumentedRejectCallback);
-    } catch (e) {
-      instrumentedRejectCallback(e);
+    if (self.resolveCallbackWasCalledByBody) {
+       instrumentedResolveCallback.apply(null, self.resolveCallbackArgs);
+    } else if (self.rejectCallbackWasCalledByBody) {
+       instrumentedRejectCallback.apply(null, self.rejectCallbackArgs);
+    } else {
+      try {
+        this.body(instrumentedResolveCallback, instrumentedRejectCallback);
+      } catch (e) {
+        instrumentedRejectCallback(e);
+      }
     }
 
     return new Promise(function(resolve, reject) {
-      //TODO: Handle other cases, rejection, exceptions
       setTimeout(function waitingForSelf() {
         if (exceptionCaught) {
           reject(exceptionCaught);

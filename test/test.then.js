@@ -170,7 +170,50 @@ module("jsPromise.then");
     });
   });
 
-  //TODO: When calling 'then' several times for the same promise it should not be executed multiple times?
+  asyncTest("Promise.then when called several times with the resolving promise its body is executed only once", function() {
+    var promisedValue = 53804;
+    var timesExecuted = 0;
+
+    var promise = new Promise(function(resolve, reject) {
+      timesExecuted++;
+      resolve(promisedValue);
+    });
+
+    promise.then(function(value) {
+      equal(value, promisedValue, "Run 1: resolved with correct value");
+      promise.then(function(value) {
+        equal(value, promisedValue, "Run 2: resolved with correct value");
+        promise.then(function(value) {
+          equal(value, promisedValue, "Run 3: resolved with correct value");
+          equal(timesExecuted, 1, "Promise body is executed only once");
+          start();
+        });
+      });
+    });
+  });
+
+  asyncTest("Promise.then when called several times with the rejecting promise its body is executed only once", function() {
+    var rejectedValue = 53804;
+    var timesExecuted = 0;
+
+    var promise = new Promise(function(resolve, reject) {
+      timesExecuted++;
+      reject(rejectedValue);
+    });
+
+    promise.then(function(){}, function(value) {
+      equal(value, rejectedValue, "Run 1: rejected with correct value");
+      promise.then(function(){}, function(value) {
+        equal(value, rejectedValue, "Run 2: rejected with correct value");
+        promise.then(function(){}, function(value) {
+          equal(value, rejectedValue, "Run 3: rejected with correct value");
+          equal(timesExecuted, 1, "Promise body is executed only once");
+          start();
+        });
+      });
+    });
+  });
+
   //TODO: Promise can be resolved with 'undefined', 'null'
   //TODO: Promise can be rejected with 'undefined', 'null'
   //TODO: 'resolve' callback is 'undefined', 'null'
