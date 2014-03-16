@@ -21,8 +21,12 @@
         resolve();
         return;
       }
-      values.length = promises.length;
+      promises = promises.map(function(promise) {
+        return (promise.constructor == Promise) ? promise
+          : Promise.resolve(promise);
+      });
 
+      values.length = promises.length;
       promises.forEach(function(promise, idx) {
         promise.then(function(value) {
           if (isRejected) {
@@ -62,7 +66,7 @@
   };
 
   Promise.cast = function(value) {
-    return (value.constructor == Promise) 
+    return (value.constructor == Promise)
       ? value
       : new Promise(function(resolve, reject) {
         resolve(value);

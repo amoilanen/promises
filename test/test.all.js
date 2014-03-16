@@ -165,5 +165,26 @@ module("jsPromise.all");
     }, function(rejectedValue) {});
   });
 
-  //TODO: Array can be array of promises intermixed with promise-like objects and values
+  asyncTest("Promise.all if one of the values is not a promise it is cast to a promise", function() {
+    var allPromises = [resolvingPromise("a"), "b", resolvingPromise("c")];
+
+    Promise.all(allPromises).then(function(value) {
+      deepEqual(value, ["a", "b", "c"], "Resolves when all the promises resolve");
+      start();
+    });
+  });
+
+  asyncTest("Promise.all if one of the values is a promise-like object it is cast to a promise", function() {
+    var resolvingPromiseLikeObject = {
+      then: function(resolve, reject) {
+        resolve("b");
+      }
+    };
+    var allPromises = [resolvingPromise("a"), resolvingPromiseLikeObject, resolvingPromise("c")];
+
+    Promise.all(allPromises).then(function(value) {
+      deepEqual(value, ["a", "b", "c"], "Resolves when all the promises resolve");
+      start();
+    });
+  });
 })();

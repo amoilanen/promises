@@ -6,19 +6,6 @@ API:
 
 Static Methods
 
-Promise.all(array);
-Make a promise that fulfills when every item in the array fulfills, 
-
-and rejects if (and when) any item rejects. 
-
-Each array item is passed to Promise.cast, so the array can be a mixture of promise-like objects and other objects. 
-
-The fulfillment value is an array (in order) of fulfillment values. 
-
-The rejection value is the first rejection value.
-
-Note: Only implemented in Chrome so far
-
 Promise.race(array);
 Make a Promise that fulfills when any item fulfills, and rejects if any item rejects.
 Note: Only implemented in Chrome as Promise.one. Also, I'm unconvinced of it's usefulness, I'd rather have an opposite of Promise.all that only rejected if all items rejected.
@@ -33,5 +20,3 @@ Your promise is fulfilled with obj
 reject(obj)
 Your promise is rejected with obj. For consistency and debugging (eg stack traces), obj should be an instanceof Error. Any errors thrown in the constructor callback will be implicitly passed to reject().
 Instance Methods
-
-Many thanks to Anne van Kesteren, Domenic Denicola, Tom Ashworth, Remy Sharp, Addy Osmani, Arthur Evans, and Yutaka Hirano who proofread this and made corrections/recommendations.
