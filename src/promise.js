@@ -6,6 +6,24 @@
     this.body = body;
   }
 
+  Promise.all = function(promises) {
+    return new Promise(function(resolve, reject) {
+      var computed = 0;
+      var values = {};
+
+      values.length = promises.length;
+      promises.forEach(function(promise, idx) {
+        promise.then(function(value) {
+          computed++;
+          values[idx] = value;
+          if (computed == promises.length) {
+            resolve([].slice.call(values, 0));
+          }
+        });
+      });
+    });
+  };
+
   Promise.resolve = function(value) {
     return new Promise(function(resolve, reject) {
       if (value.then && (typeof(value.then) == "function")) {
