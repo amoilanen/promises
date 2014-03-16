@@ -2,17 +2,27 @@ module("jsPromise.all");
 
 (function() {
 
-  function resolvingPromise(resolveValue) {
+  function resolvingPromise(value, timeout) {
     return new Promise(function(resolve, reject) {
-      resolve(resolveValue);
+      if (timeout) {
+        setTimeout(function() {
+          resolve(value);
+        }, timeout);
+      } else {
+        resolve(value);
+      }
     });
   }
 
-  function resolvingPromiseWithTimeout(resolveValue, timeout) {
+  function rejectingPromise(value, timeout) {
     return new Promise(function(resolve, reject) {
-      setTimeout(function() {
-        resolve(resolveValue);
-      }, timeout);
+      if (timeout) {
+        setTimeout(function() {
+          reject(value);
+        }, timeout);
+      } else {
+        reject(value);
+      }
     });
   }
 
@@ -27,9 +37,9 @@ module("jsPromise.all");
 
   asyncTest("Promise.all keeps the order of asynchronous argument promises in the resolved value", function() {
     var allPromises = [
-      resolvingPromiseWithTimeout("a", 1500),
-      resolvingPromiseWithTimeout("b", 1000),
-      resolvingPromiseWithTimeout("c", 500)
+      resolvingPromise("a", 1500),
+      resolvingPromise("b", 1000),
+      resolvingPromise("c", 500)
     ];
 
     Promise.all(allPromises).then(function(value) {
@@ -81,6 +91,79 @@ module("jsPromise.all");
     });
   });
 
-  //TODO: Rejects if one of the promises rejects, the value is the first rejected value
+  asyncTest("Promise.all rejects if one of the promises rejects", function() {
+    var allPromises = [
+      resolvingPromise("a"),
+      resolvingPromise("b"),
+      rejectingPromise("c"),
+      resolvingPromise("d"),
+      resolvingPromise("e")
+    ];
+
+    Promise.all(allPromises).then(function(resolvedValue) {
+      ok(false, "Should not be resolved");
+      start();
+    }, function(rejectedValue) {
+      equal(rejectedValue, "c", "Rejected value from the first rejecting promise is returned");
+      start();
+    });
+  });
+
+  asyncTest("Promise.all rejects if all of the promises rejects", function() {
+    var allPromises = [
+      rejectingPromise("a", 1500),
+      rejectingPromise("b", 1000),
+      rejectingPromise("c", 500)
+    ];
+
+    Promise.all(allPromises).then(function(resolvedValue) {
+      ok(false, "Should not be resolved");
+      start();
+    }, function(rejectedValue) {
+      equal(rejectedValue, "c", "Rejects with the value of the first rejected promise");
+      start();
+    });
+  });
+
+  asyncTest("Promise.all rejecting promise is executed after the first rejected promise", function() {
+    var rejectedValue = "rejectedValue";
+    var x = new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        reject(rejectedValue);
+        ok(true, "The rejecting promise is still executed");
+        start();
+      }, 1000);
+    });
+    var allPromises = [
+      rejectingPromise("a"),
+      x
+    ];
+
+    Promise.all(allPromises).then(function(resolvedValue) {
+      ok(false, "Promise.all should not be resolved");
+      start();
+    }, function(rejectedValue) {});
+  });
+
+  asyncTest("Promise.all resolving promise is executed after the first rejected promise", function() {
+    var resolvedValue = "resolvedValue";
+    var x = new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        resolve(resolvedValue);
+        ok(true, "The resolving promise is still executed");
+        start();
+      }, 1000);
+    });
+    var allPromises = [
+      rejectingPromise("a"),
+      x
+    ];
+
+    Promise.all(allPromises).then(function(resolvedValue) {
+      ok(false, "Promise.all should not be resolved");
+      start();
+    }, function(rejectedValue) {});
+  });
+
   //TODO: Array can be array of promises intermixed with promise-like objects and values
 })();

@@ -170,6 +170,7 @@ module("jsPromise.then");
     });
   });
 
+  //TODO: When calling 'then' several times for the same promise it should not be executed multiple times?
   //TODO: Promise can be resolved with 'undefined', 'null'
   //TODO: Promise can be rejected with 'undefined', 'null'
   //TODO: 'resolve' callback is 'undefined', 'null'

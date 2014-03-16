@@ -10,6 +10,7 @@
     return new Promise(function(resolve, reject) {
       var computed = 0;
       var values = {};
+      var isRejected = false;
 
       promises = promises || [];
       if (!(promises instanceof Array)) {
@@ -21,14 +22,23 @@
         return;
       }
       values.length = promises.length;
+
       promises.forEach(function(promise, idx) {
         promise.then(function(value) {
+          if (isRejected) {
+            return;
+          }
           computed++;
           values[idx] = value;
           if (computed == promises.length) {
             resolve([].slice.call(values, 0));
+          }
+        }, function(value) {
+          if (isRejected) {
             return;
           }
+          isRejected = true;
+          reject(value);
         });
       });
     });
