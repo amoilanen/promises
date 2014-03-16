@@ -11,6 +11,15 @@
       var computed = 0;
       var values = {};
 
+      promises = promises || [];
+      if (!(promises instanceof Array)) {
+        reject(new Error("Promise.all: invalid arguments"));
+        return;
+      }
+      if (promises.length == 0) {
+        resolve();
+        return;
+      }
       values.length = promises.length;
       promises.forEach(function(promise, idx) {
         promise.then(function(value) {
@@ -18,6 +27,7 @@
           values[idx] = value;
           if (computed == promises.length) {
             resolve([].slice.call(values, 0));
+            return;
           }
         });
       });
