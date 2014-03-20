@@ -77,7 +77,7 @@ module("jsPromise.all");
   });
 
   asyncTest("Promise.all accepts only one array argument, otherwise rejects", function() {
-    var errorMessage = "Promise.all: invalid arguments";
+    var errorMessage = "Invalid arguments";
 
     Promise.all(
       resolvingPromise("a"),

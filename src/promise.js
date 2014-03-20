@@ -11,26 +11,53 @@
     this.rejectCallbackArgs = null;
   }
 
+  function prepare(resolve, reject, promises) {
+    promises = promises || [];
+    if (!(promises instanceof Array)) {
+      reject(new Error("Invalid arguments"));
+      return [];
+    }
+    if (promises.length == 0) {
+      resolve();
+      return [];
+    }
+    promises = promises.map(function(promise) {
+      return (promise.constructor == Promise) ? promise
+        : Promise.resolve(promise);
+    });
+    return promises;
+  }
+
+  Promise.race = function(promises) {
+    return new Promise(function(resolve, reject) {
+      var wasResolved = false;
+
+      promises = prepare(resolve, reject, promises);
+      promises.forEach(function(promise) {
+        promise.then(function(value) {
+          if (wasResolved) {
+            return;
+          }
+          wasResolved = true;
+          resolve(value);
+        }, function(value) {
+          if (wasResolved) {
+            return;
+          }
+          wasResolved = true;
+          reject(value);
+        });
+      });
+    });
+  };
+
   Promise.all = function(promises) {
     return new Promise(function(resolve, reject) {
       var computed = 0;
       var values = {};
       var isRejected = false;
 
-      promises = promises || [];
-      if (!(promises instanceof Array)) {
-        reject(new Error("Promise.all: invalid arguments"));
-        return;
-      }
-      if (promises.length == 0) {
-        resolve();
-        return;
-      }
-      promises = promises.map(function(promise) {
-        return (promise.constructor == Promise) ? promise
-          : Promise.resolve(promise);
-      });
-
+      promises = prepare(resolve, reject, promises);
       values.length = promises.length;
       promises.forEach(function(promise, idx) {
         promise.then(function(value) {
