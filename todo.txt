@@ -1,3 +1,21 @@
+//TODO: Test that when a promise like object is returned from 'then' callback, then the next 'then' callback waits for this promise to be settled before calling its callbacks
+
+//TODO: Test that the first available rejection callback is called downstream in case an error happens or a promise is rejected. The rejection callback on the level where rejection happened is not called
+
+//TODO: Test that after rejection callback is called the normal execution continues
+
+//TODO: Test that if error is thrown in the promise constructor, then rejection happens
+
+//TODO: Test that Promise.resolve() can be called without arguments and then chained after with 'then'
+
+//From http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/
+//TODO: Fulfilled, fulfillment handler returns a value: simple functional transformation
+//TODO: Fulfilled, fulfillment handler throws an exception: getting data, and throwing an exception in response to it
+//TODO: Rejected, rejection handler returns a value: a catch clause got the error and handled it
+//TODO: Rejected, rejection handler throws an exception: a catch clause got the error and re-threw it (or a new one)
+
+//TODO: Run the Promises/A+ tests against the implementation https://github.com/promises-aplus/promises-tests
+
 Article:
 
 http://www.html5rocks.com/en/tutorials/es6/promises/
